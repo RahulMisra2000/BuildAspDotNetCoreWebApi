@@ -176,7 +176,9 @@ namespace Library.API.Controllers
                 }
             // ************** UPSERT LOGIC IN ACTION ************************************************
             
-            
+            // This will take stuff from book (dto) and update the same property values in bookForAuthorFromRepo
+            // and this will cause EF to recognize that the BOOK Entity has changed and so when a save() is done 
+            // the changes will be persisted.
             Mapper.Map(book, bookForAuthorFromRepo);
 
             _libraryRepository.UpdateBookForAuthor(bookForAuthorFromRepo);
