@@ -154,25 +154,29 @@ namespace Library.API.Controllers
             }
 
             var bookForAuthorFromRepo = _libraryRepository.GetBookForAuthor(authorId, id);
-            if (bookForAuthorFromRepo == null)
-            {
-                var bookToAdd = Mapper.Map<Book>(book);
-                bookToAdd.Id = id;
-
-                _libraryRepository.AddBookForAuthor(authorId, bookToAdd);
-
-                if (!_libraryRepository.Save())
+            
+            // ************** UPSERT LOGIC IN ACTION ************************************************
+                if (bookForAuthorFromRepo == null)
                 {
-                    throw new Exception($"Upserting book {id} for author {authorId} failed on save.");
+                    var bookToAdd = Mapper.Map<Book>(book);
+                    bookToAdd.Id = id;
+
+                    _libraryRepository.AddBookForAuthor(authorId, bookToAdd);
+
+                    if (!_libraryRepository.Save())
+                    {
+                        throw new Exception($"Upserting book {id} for author {authorId} failed on save.");
+                    }
+
+                    var bookToReturn = Mapper.Map<BookDto>(bookToAdd);
+
+                    return CreatedAtRoute("GetBookForAuthor",
+                        new { authorId = authorId, id = bookToReturn.Id},
+                        bookToReturn);
                 }
-
-                var bookToReturn = Mapper.Map<BookDto>(bookToAdd);
-
-                return CreatedAtRoute("GetBookForAuthor",
-                    new { authorId = authorId, id = bookToReturn.Id},
-                    bookToReturn);
-            }
-
+            // ************** UPSERT LOGIC IN ACTION ************************************************
+            
+            
             Mapper.Map(book, bookForAuthorFromRepo);
 
             _libraryRepository.UpdateBookForAuthor(bookForAuthorFromRepo);
