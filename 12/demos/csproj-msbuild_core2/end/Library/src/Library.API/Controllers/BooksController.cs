@@ -170,6 +170,9 @@ namespace Library.API.Controllers
             }
 
             var bookForAuthorFromRepo = _libraryRepository.GetBookForAuthor(authorId, id);
+             
+             
+          // ************** UPSERT LOGIC  ************************************************
             if (bookForAuthorFromRepo == null)
             {
                 var bookToAdd = Mapper.Map<Book>(book);
@@ -188,6 +191,11 @@ namespace Library.API.Controllers
                     new { authorId = authorId, id = bookToReturn.Id},
                     bookToReturn);
             }
+            // ************** UPSERT LOGIC  ************************************************
+            
+            // This will take stuff from book (dto) and update the same property values in bookForAuthorFromRepo
+            // and this will cause EF to recognize that the BOOK Entity has changed and so when a save() is done 
+            // the changes will be persisted.
 
             Mapper.Map(book, bookForAuthorFromRepo);
 
@@ -216,7 +224,9 @@ namespace Library.API.Controllers
             }
 
             var bookForAuthorFromRepo = _libraryRepository.GetBookForAuthor(authorId, id);
-
+   
+   
+            // ************** UPSERT LOGIC  ************************************************
             if (bookForAuthorFromRepo == null)
             {
                 var bookDto = new BookForUpdateDto();
@@ -253,23 +263,29 @@ namespace Library.API.Controllers
                     new { authorId = authorId, id = bookToReturn.Id },
                     bookToReturn);
             }
+            // ************** UPSERT LOGIC ************************************************
 
+            // DTO  <----- Entity                Fill DTO with stuff from the Entity in the database
             var bookToPatch = Mapper.Map<BookForUpdateDto>(bookForAuthorFromRepo);
 
+            // Apply the instructions and data in the patch document (from http request) to the DTO
             patchDoc.ApplyTo(bookToPatch, ModelState);
 
            // patchDoc.ApplyTo(bookToPatch);
+            
+           // Validation **************
+                if (bookToPatch.Description == bookToPatch.Title) {
+                    ModelState.AddModelError(nameof(BookForUpdateDto), "The provided description should be different from the title.");
+                }
 
-            if (bookToPatch.Description == bookToPatch.Title) {
-                ModelState.AddModelError(nameof(BookForUpdateDto), "The provided description should be different from the title.");
-            }
+                TryValidateModel(bookToPatch);
 
-            TryValidateModel(bookToPatch);
+                if (!ModelState.IsValid) {
+                    return new UnprocessableEntityObjectResult(ModelState);
+                }
+            // Validation **************
 
-            if (!ModelState.IsValid) {
-                return new UnprocessableEntityObjectResult(ModelState);
-            }
-           
+            // DTO ----> Entity
             Mapper.Map(bookToPatch, bookForAuthorFromRepo);
 
             _libraryRepository.UpdateBookForAuthor(bookForAuthorFromRepo);
