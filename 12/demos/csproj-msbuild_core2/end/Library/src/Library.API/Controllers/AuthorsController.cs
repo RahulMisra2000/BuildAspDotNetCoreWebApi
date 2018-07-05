@@ -33,18 +33,13 @@ namespace Library.API.Controllers
 
         [HttpGet(Name = "GetAuthors")]
         [HttpHead]
-        public IActionResult GetAuthors(AuthorsResourceParameters authorsResourceParameters,
-            [FromHeader(Name = "Accept")] string mediaType)
+        public IActionResult GetAuthors(AuthorsResourceParameters authorsResourceParameters,[FromHeader(Name = "Accept")] string mediaType)
         {
-            if (!_propertyMappingService.ValidMappingExistsFor<AuthorDto, Author>
-               (authorsResourceParameters.OrderBy))
-            {
+            if (!_propertyMappingService.ValidMappingExistsFor<AuthorDto, Author>(authorsResourceParameters.OrderBy)) {
                 return BadRequest();
             }
 
-            if (!_typeHelperService.TypeHasProperties<AuthorDto>
-                (authorsResourceParameters.Fields))
-            {
+            if (!_typeHelperService.TypeHasProperties<AuthorDto>(authorsResourceParameters.Fields)) {
                 return BadRequest();
             }
             
@@ -62,19 +57,16 @@ namespace Library.API.Controllers
                     totalPages = authorsFromRepo.TotalPages,
                 };
 
-                Response.Headers.Add("X-Pagination",
-                    Newtonsoft.Json.JsonConvert.SerializeObject(paginationMetadata));
+                Response.Headers.Add("X-Pagination", Newtonsoft.Json.JsonConvert.SerializeObject(paginationMetadata));
 
-                var links = CreateLinksForAuthors(authorsResourceParameters,
-                    authorsFromRepo.HasNext, authorsFromRepo.HasPrevious);
+                var links = CreateLinksForAuthors(authorsResourceParameters, authorsFromRepo.HasNext, authorsFromRepo.HasPrevious);
 
                 var shapedAuthors = authors.ShapeData(authorsResourceParameters.Fields);
 
                 var shapedAuthorsWithLinks = shapedAuthors.Select(author =>
                 {
                     var authorAsDictionary = author as IDictionary<string, object>;
-                    var authorLinks = CreateLinksForAuthor(
-                        (Guid)authorAsDictionary["Id"], authorsResourceParameters.Fields);
+                    var authorLinks = CreateLinksForAuthor((Guid)authorAsDictionary["Id"], authorsResourceParameters.Fields);
 
                     authorAsDictionary.Add("links", authorLinks);
 
@@ -109,8 +101,7 @@ namespace Library.API.Controllers
                     totalPages = authorsFromRepo.TotalPages
                 };
 
-                Response.Headers.Add("X-Pagination",
-                    Newtonsoft.Json.JsonConvert.SerializeObject(paginationMetadata));
+                Response.Headers.Add("X-Pagination", Newtonsoft.Json.JsonConvert.SerializeObject(paginationMetadata));
 
                 return Ok(authors.ShapeData(authorsResourceParameters.Fields));
             }
