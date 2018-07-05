@@ -49,7 +49,7 @@ namespace Library.API.Helpers
                               .Take(pageSize)
                               .ToList();                                // EXECUTE THE QUERY  ... and get back List<T>
             
-            // ** Here T becomes by whatever T is in the Method call
+            // ** Here T becomes whatever T is in the Method call
             return new PagedList<T>(items, count, pageNumber, pageSize);
         }
     }
