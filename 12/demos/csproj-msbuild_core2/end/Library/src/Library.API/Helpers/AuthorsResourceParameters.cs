@@ -36,6 +36,9 @@ namespace Library.API.Helpers
         //  ere we are giving it a default value
             public string OrderBy { get; set; } = "Name";
 
+        // For DATA SHAPING
+        // So, the client can specify a list of fields from the Authors table that they are interested in getting back 
+        // I guess the client will send a comma separated list of field name they are interested in ...
         public string Fields { get; set; }
     }
 }
