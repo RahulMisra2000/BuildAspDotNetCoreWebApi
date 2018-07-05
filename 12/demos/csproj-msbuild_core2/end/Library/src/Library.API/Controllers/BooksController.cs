@@ -220,14 +220,17 @@ namespace Library.API.Controllers
             if (bookForAuthorFromRepo == null)
             {
                 var bookDto = new BookForUpdateDto();
+                
+                
+                // If there is any problem with the patch document then the ModelState will be updated with the error *************
                 patchDoc.ApplyTo(bookDto, ModelState);
 
-                if (bookDto.Description == bookDto.Title)
-                {
-                    ModelState.AddModelError(nameof(BookForUpdateDto), 
-                        "The provided description should be different from the title.");
+                // Manual validation
+                if (bookDto.Description == bookDto.Title) {
+                    ModelState.AddModelError(nameof(BookForUpdateDto), "The provided description should be different from the title.");
                 }
 
+                // Forcing the Validation to happen so, we can check the ModelState for validity **********
                 TryValidateModel(bookDto);
 
                 if (!ModelState.IsValid)
@@ -257,16 +260,13 @@ namespace Library.API.Controllers
 
            // patchDoc.ApplyTo(bookToPatch);
 
-            if (bookToPatch.Description == bookToPatch.Title)
-            {
-                ModelState.AddModelError(nameof(BookForUpdateDto), 
-                    "The provided description should be different from the title.");
+            if (bookToPatch.Description == bookToPatch.Title) {
+                ModelState.AddModelError(nameof(BookForUpdateDto), "The provided description should be different from the title.");
             }
 
             TryValidateModel(bookToPatch);
 
-            if (!ModelState.IsValid)
-            {
+            if (!ModelState.IsValid) {
                 return new UnprocessableEntityObjectResult(ModelState);
             }
            
