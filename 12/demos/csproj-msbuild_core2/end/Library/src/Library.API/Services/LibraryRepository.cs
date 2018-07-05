@@ -74,28 +74,32 @@ namespace Library.API.Services
             //    .OrderBy(a => a.FirstName)
             //    .ThenBy(a => a.LastName).AsQueryable();
 
+          // SORTING *********************************************************************************
             var collectionBeforePaging =
                 _context.Authors.ApplySort(authorsResourceParameters.OrderBy,
                 _propertyMappingService.GetPropertyMapping<AuthorDto, Author>());
 
-            if (!string.IsNullOrEmpty(authorsResourceParameters.Genre)) {
-                // trim & ignore casing
-                var genreForWhereClause = authorsResourceParameters.Genre.Trim().ToLowerInvariant();
-                collectionBeforePaging = collectionBeforePaging.Where(a => a.Genre.ToLowerInvariant() == genreForWhereClause);
+
+          // FILTERING *********************************************************************************
+            if (!string.IsNullOrEmpty(authorsResourceParameters.Genre)) {                
+                var g = authorsResourceParameters.Genre.Trim().ToLowerInvariant();
+                collectionBeforePaging = collectionBeforePaging
+                    .Where(a => a.Genre.ToLowerInvariant() == g);
             }
 
+          // SEARCHING *********************************************************************************
+          //           Per this architecture, a search text provided by client is searched inside any of the following properties
+          //           Genre, FirstName and LastName
             if (!string.IsNullOrEmpty(authorsResourceParameters.SearchQuery)) {                
-                var searchQueryForWhereClause = authorsResourceParameters.SearchQuery.Trim().ToLowerInvariant();
+                var q = authorsResourceParameters.SearchQuery.Trim().ToLowerInvariant();
 
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => a.Genre.ToLowerInvariant().Contains(searchQueryForWhereClause)
-                            || a.FirstName.ToLowerInvariant().Contains(searchQueryForWhereClause)
-                            || a.LastName.ToLowerInvariant().Contains(searchQueryForWhereClause));
+                    .Where(a => a.Genre.ToLowerInvariant().Contains(q)
+                            || a.FirstName.ToLowerInvariant().Contains(q)
+                            || a.LastName.ToLowerInvariant().Contains(q));
             }
 
-            return PagedList<Author>.Create(collectionBeforePaging,
-                authorsResourceParameters.PageNumber,
-                authorsResourceParameters.PageSize);               
+            return PagedList<Author>.Create(collectionBeforePaging, authorsResourceParameters.PageNumber, authorsResourceParameters.PageSize);               
         }
 
         public IEnumerable<Author> GetAuthors(IEnumerable<Guid> authorIds)
