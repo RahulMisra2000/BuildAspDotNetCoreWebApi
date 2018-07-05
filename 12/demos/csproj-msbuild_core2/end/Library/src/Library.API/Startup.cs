@@ -140,22 +140,21 @@ namespace Library.API
             }
             else
             {
+                // *************************** GLOBAL EXCEPTION HANDLER ************************************************
+                // Any uncaught Exception in our code will be handled by the UseExceptionHandler middleware
                 app.UseExceptionHandler(appBuilder =>
                 {
                     appBuilder.Run(async context =>
                     {
-                        var exceptionHandlerFeature = context.Features.Get<IExceptionHandlerFeature>();
-                        if (exceptionHandlerFeature != null)
+                        var ex = context.Features.Get<IExceptionHandlerFeature>();
+                        if (ex != null)
                         {
                             var logger = loggerFactory.CreateLogger("Global exception logger");
-                            logger.LogError(500,
-                                exceptionHandlerFeature.Error,
-                                exceptionHandlerFeature.Error.Message);
+                            logger.LogError(500, ex.Error, ex.Error.Message);
                         }
 
                         context.Response.StatusCode = 500;
                         await context.Response.WriteAsync("An unexpected fault happened. Try again later.");
-
                     });                      
                 });
             }
