@@ -40,15 +40,16 @@ namespace Library.API.Helpers
             AddRange(items);
         }
 
-       // Whoever calls this method will provide the T
-       // and the first parameter should be an IQueryable of that T
+       // Whoever calls this method will have to specify what T is like PagedList<Author>.Create(x,y,z) 
+       // and x better be an IQueryable<Author>        
         public static PagedList<T> Create(IQueryable<T> source, int pageNumber, int pageSize)
         {
             var count = source.Count();
             var items = source.Skip((pageNumber - 1) * pageSize)
                               .Take(pageSize)
-                              .ToList();                                // EXECUTE THE QUERY
-                              
+                              .ToList();                                // EXECUTE THE QUERY  ... and get back List<T>
+            
+            // ** Here T becomes by whatever T is in the Method call
             return new PagedList<T>(items, count, pageNumber, pageSize);
         }
     }
