@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 
 namespace Library.API.Helpers
 {
-// ****** This will be specified as a Controller's Action Parmater so that if the Http Request contains any key / value pairs whose key matches 
-//        the public properties of this class then the value will be populated and the Controller's Action will have access toit.
+// ****** This will be specified as a Controller's Action Parameter so that if the Http Request contains any key / value pairs 
+//        whose key matches the public properties of this class then the value will be populated. The ModelBinder that does this is
+//        pretty smart.
     public class AuthorsResourceParameters
     {
         // For PAGING 
