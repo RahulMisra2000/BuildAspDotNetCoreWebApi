@@ -149,6 +149,8 @@ namespace Library.API
                         var ex = context.Features.Get<IExceptionHandlerFeature>();
                         if (ex != null)
                         {
+                            // Since ILoggerFactory is already injected, we might as well use it for creating a logger and then using it
+                            // BUT, in other places in code we can just inject an ILogger<T> into the ctor and then use it 
                             var logger = loggerFactory.CreateLogger("Global exception logger");
                             logger.LogError(500, ex.Error, ex.Error.Message);
                         }
