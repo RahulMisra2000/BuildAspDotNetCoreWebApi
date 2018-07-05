@@ -79,12 +79,17 @@ namespace Library.API.Controllers
                 return BadRequest();
             }
 
+            // Custom Validation  -- Manually adding errors to the ModelState
             if (book.Description == book.Title)
             {
-                ModelState.AddModelError(nameof(BookForCreationDto),
-                    "The provided description should be different from the title.");
+                // The first parameter is either the name of the property that fails validation OR the name of the class if the 
+                // validation is inter-property ...
+                // The second parameter is the error message
+                ModelState.AddModelError(nameof(BookForCreationDto),  "The provided description should be different from the title.");
             }
 
+            // Model Binder automatically does Validation based on Data Annotation (RRR,etc) that have been applied to the properties
+            // and adds errors to the ModelState
             if (!ModelState.IsValid)
             {
                 // return 422
