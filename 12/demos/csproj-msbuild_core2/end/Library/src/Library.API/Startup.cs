@@ -88,15 +88,19 @@ namespace Library.API
             services.AddTransient<IPropertyMappingService, PropertyMappingService>();
             services.AddTransient<ITypeHelperService, TypeHelperService>();
 
-            // ***************** This will add directives to the Cache-Control Http Response Header
+            // ***************** This will add directives to the Cache-Control Http Response Header ******************************
             // There are many options and you will get intellisense when you do expirationModelOptions. or validationModelOptions.
-            // 
+            // ************************************ V IMP *******************************
+            // This will ALSO add the eTag, Last-Modified & Expires Http headers in addition to the directives in the 
+            // Cache-Control Header
+            
             services.AddHttpCacheHeaders( (expirationModelOptions) => {
                                                 expirationModelOptions.MaxAge = 600;
                                             }, 
                                           (validationModelOptions) => {
                                                 validationModelOptions.AddMustRevalidate = true;
                 });
+            // *********************************************************************************************************************
             
             services.AddMemoryCache();
 
