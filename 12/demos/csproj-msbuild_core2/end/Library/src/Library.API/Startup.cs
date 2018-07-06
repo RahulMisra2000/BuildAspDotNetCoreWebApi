@@ -35,29 +35,27 @@ namespace Library.API
         {
             services.AddMvc(setupAction =>
             {
+                // If this is true then if the client's Accept header's value is not supported by the Outputformatters here then,
+                // HttpStatus Response Code 406 will be sent back to the client
                 setupAction.ReturnHttpNotAcceptable = true;
+                
+                
                 setupAction.OutputFormatters.Add(new XmlDataContractSerializerOutputFormatter());
                 // setupAction.InputFormatters.Add(new XmlDataContractSerializerInputFormatter());
 
-                var xmlDataContractSerializerInputFormatter = 
-                new XmlDataContractSerializerInputFormatter();
-                xmlDataContractSerializerInputFormatter.SupportedMediaTypes
-                    .Add("application/vnd.marvin.authorwithdateofdeath.full+xml");
+                var xmlDataContractSerializerInputFormatter = new XmlDataContractSerializerInputFormatter();
+                xmlDataContractSerializerInputFormatter.SupportedMediaTypes.Add("application/vnd.marvin.authorwithdateofdeath.full+xml");
                 setupAction.InputFormatters.Add(xmlDataContractSerializerInputFormatter);
                 
-                var jsonInputFormatter = setupAction.InputFormatters
-                .OfType<JsonInputFormatter>().FirstOrDefault();
+                var jsonInputFormatter = setupAction.InputFormatters.OfType<JsonInputFormatter>().FirstOrDefault();
 
                 if (jsonInputFormatter != null)
                 {
-                    jsonInputFormatter.SupportedMediaTypes
-                    .Add("application/vnd.marvin.author.full+json");
-                    jsonInputFormatter.SupportedMediaTypes
-                    .Add("application/vnd.marvin.authorwithdateofdeath.full+json");
+                    jsonInputFormatter.SupportedMediaTypes.Add("application/vnd.marvin.author.full+json");
+                    jsonInputFormatter.SupportedMediaTypes.Add("application/vnd.marvin.authorwithdateofdeath.full+json");
                 }
                 
-                var jsonOutputFormatter = setupAction.OutputFormatters
-                    .OfType<JsonOutputFormatter>().FirstOrDefault();
+                var jsonOutputFormatter = setupAction.OutputFormatters.OfType<JsonOutputFormatter>().FirstOrDefault();
 
                 if (jsonOutputFormatter != null)
                 {
@@ -65,10 +63,8 @@ namespace Library.API
                 }
 
             })
-            .AddJsonOptions(options =>
-            {
-                options.SerializerSettings.ContractResolver =
-                new CamelCasePropertyNamesContractResolver();
+            .AddJsonOptions(options => {
+                  options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             });
 
             // register the DbContext on the container, getting the connection string from
@@ -90,19 +86,16 @@ namespace Library.API
             });
 
             services.AddTransient<IPropertyMappingService, PropertyMappingService>();
-
             services.AddTransient<ITypeHelperService, TypeHelperService>();
 
-            services.AddHttpCacheHeaders(
-                (expirationModelOptions)
-                =>
-                {
-                    expirationModelOptions.MaxAge = 600;
-                }, 
-                (validationModelOptions)
-                =>
-                {
-                    validationModelOptions.AddMustRevalidate = true;
+            // ***************** This will add directives to the Cache-Control Http Response Header
+            // There are many options and you will get intellisense when you do expirationModelOptions. or validationModelOptions.
+            // 
+            services.AddHttpCacheHeaders( (expirationModelOptions) => {
+                                                expirationModelOptions.MaxAge = 600;
+                                            }, 
+                                          (validationModelOptions) => {
+                                                validationModelOptions.AddMustRevalidate = true;
                 });
             
             services.AddMemoryCache();
@@ -186,6 +179,9 @@ namespace Library.API
 
             app.UseIpRateLimiting();
 
+            // ************** This middleware MUST be placed BEFORE the UseMvc so that it can stop the Request from processing 
+            // any further and return Http Status code of 304 Not Modified or 412 PreCondition Failed ... if need be
+            // Also this middleware adds Cache-Control Response Headers ..... based on how they are configured in the above method.
             app.UseHttpCacheHeaders();
 
             app.UseMvc(); 
