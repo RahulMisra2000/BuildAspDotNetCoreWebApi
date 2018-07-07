@@ -55,8 +55,16 @@ namespace Library.API
                     jsonInputFormatter.SupportedMediaTypes.Add("application/vnd.marvin.authorwithdateofdeath.full+json");
                 }
                 
+                // **** We get hold of the FIRST JSON output formatter
                 var jsonOutputFormatter = setupAction.OutputFormatters.OfType<JsonOutputFormatter>().FirstOrDefault();
 
+                // and if it found then, we configure it to support custom media type shown below.
+                // SO, as a result if the client sends an Http Request with an Accept: application/vnd.marvin.hateoas+json
+                // the Output Formatter won't throw an error 406 Not Acceptable .....
+                // Then in our controller's Action's parameter we could do 
+                // [FromHeader(Name="Accept") string x]
+                // and then compare x to "application/vnd.marvin.hateoas+json" or to "application/json" and place different
+                // stuff in the Http Response body and Http Response Header depending on the API documentation ....
                 if (jsonOutputFormatter != null)
                 {
                     jsonOutputFormatter.SupportedMediaTypes.Add("application/vnd.marvin.hateoas+json");
