@@ -109,6 +109,7 @@ namespace Library.API
             services.AddMemoryCache();
 
             
+            
             // *****************  This is configuring the https://github.com/stefanprodan/AspNetCoreRateLimit/wiki/IpRateLimitMiddleware
             //                    MIDDLEWARE which controls how frequently the web apis can be called
             services.Configure<IpRateLimitOptions>((options) =>
@@ -132,6 +133,8 @@ namespace Library.API
 
             services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
             services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+            // ************************************************************************************************************************
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
