@@ -102,8 +102,15 @@ namespace Library.API
                 });
             // *********************************************************************************************************************
             
+            
+            // *****************  This service allows us to do DATA caching in the server's memory *********************************
+            //                    This is for DATA caching ... NOT NOT Http Response Caching ...
+            //                    This is used by the IP Rate Limiting Middleware for storing API call counts in memory ....
             services.AddMemoryCache();
 
+            
+            // *****************  This is configuring the https://github.com/stefanprodan/AspNetCoreRateLimit/wiki/IpRateLimitMiddleware
+            //                    MIDDLEWARE which controls how frequently the web apis can be called
             services.Configure<IpRateLimitOptions>((options) =>
             {
                 options.GeneralRules = new System.Collections.Generic.List<RateLimitRule>()
