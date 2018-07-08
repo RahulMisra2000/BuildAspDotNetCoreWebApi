@@ -35,6 +35,6 @@ namespace Library.API.Helpers
                 if (match) { return true; }
             }
             return false;
-        }
+        } 
     }
 }
